@@ -1,0 +1,5 @@
+.env
+node_modules/
+
+# 演示密钥独立配置：虽然叫 .env，但它随仓库 git 分发（clone 后可用），故豁免忽略。
+!demo/111/.env

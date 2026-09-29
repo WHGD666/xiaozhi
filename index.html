@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小知 - AI 学习伙伴</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      },
+      startup: {
+        ready() {
+          MathJax.startup.defaultReady();
+          document.dispatchEvent(new CustomEvent('xiaozhi:math-ready'));
+        }
+      }
+    };
+  </script>
+  <script defer src="/node_modules/mathjax/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><div class="brand-icon"><i class="fas fa-robot"></i></div><div><h1>小知</h1><p>AI 学习伙伴</p></div></div>
+      <nav class="sidebar-nav" aria-label="主导航">
+        <button class="nav-item active" data-page="chat" onclick="switchPage('chat')"><i class="fas fa-comments"></i><span>学习对话</span></button>
+        <button class="nav-item" data-page="analytics" onclick="switchPage('analytics')"><i class="fas fa-chart-line"></i><span>学习统计</span></button>
+        <button class="nav-item" data-page="dashboard" onclick="openStatisticsDashboard()"><i class="fas fa-chart-pie"></i><span>数据大屏</span></button>
+        <button class="nav-item" data-page="plans" onclick="switchPage('plans')"><i class="fas fa-list-check"></i><span>计划列表</span></button>
+        <button class="nav-item" data-page="tools" onclick="switchPage('tools')"><i class="fas fa-toolbox"></i><span>学习工具</span></button>
+      </nav>
+      <div class="sidebar-card"><div class="avatar"><i class="fas fa-user-graduate"></i></div><div><strong id="profileName">同学</strong><span id="profileStreak">连续学习 0 天</span></div></div>
+    </aside>
+
+    <main class="main-content">
+      <section class="page active" id="page-chat">
+        <header class="topbar"><div class="topbar-title"><button class="menu-btn" onclick="toggleSidebar()" aria-label="打开菜单"><i class="fas fa-bars"></i></button><div><h2>学习对话</h2><p id="agentStatus">在线，随时陪你学习</p></div></div><div class="topbar-meta"><span id="topbarGoal"><i class="fas fa-circle-check"></i> 今日进度 · 待开始</span><span id="topbarStreak"><i class="fas fa-fire"></i> 连续学习 1 天</span><button class="api-badge" id="apiStatusBadge" onclick="openAiSetup()" title="大模型接入状态"><i class="fas fa-plug"></i><span id="apiStatusText">未接入</span></button><button class="icon-btn" onclick="showSettings()" title="设置"><i class="fas fa-cog"></i></button></div></header>
+        <div class="chat-messages" id="chatMessages"></div>
+        <footer class="chat-input-area"><div class="quick-actions"><button class="quick-primary" onclick="quickAction('startStudy')"><i class="fas fa-play"></i>开始学习</button><button onclick="quickAction('timer')"><i class="fas fa-stopwatch"></i>番茄钟</button><button onclick="quickAction('photo')"><i class="fas fa-camera"></i>拍照解题</button><button onclick="quickAction('goals')"><i class="fas fa-bullseye"></i>目标设定</button><button onclick="quickAction('wrongbook')"><i class="fas fa-clipboard-list"></i>错题集</button><button onclick="quickAction('dailySummary')"><i class="fas fa-chart-simple"></i>今日总结</button></div><div class="input-container"><button onclick="triggerPhotoUpload()" title="拍照解题"><i class="fas fa-camera"></i></button><input type="file" id="photoInput" accept="image/*" hidden onchange="handlePhotoUpload(event)"><input type="text" id="chatInput" placeholder="和小知说点什么..." onkeypress="handleKeyPress(event)"><button class="send-btn" id="sendBtn" onclick="sendMessage()" title="发送"><i class="fas fa-paper-plane"></i></button><button id="voiceBtn" onclick="toggleVoice()" title="语音输入"><i class="fas fa-microphone"></i></button></div></footer>
+      </section>
+
+      <section class="page" id="page-analytics">
+        <header class="topbar analytics-topbar"><div class="topbar-title"><button class="menu-btn" onclick="toggleSidebar()" aria-label="打开菜单"><i class="fas fa-bars"></i></button><div><span class="analytics-eyebrow">LEARNING ANALYTICS</span><h2>学习统计</h2><p>把每一次学习，都变成看得见的成长。</p></div></div><button class="dashboard-entry-btn" onclick="openStatisticsDashboard()"><i class="fas fa-sparkles"></i><span>进入数据大屏</span><i class="fas fa-arrow-right"></i></button></header>
+        <div class="page-scroll analytics-scroll"><div class="stats-grid analytics-kpis"><div class="stat-card stat-study"><div class="stat-icon"><i class="fas fa-clock"></i></div><span>今日学习</span><strong><b id="totalStudyTime">0</b><em>min</em></strong><small>已记录的有效学习时长</small><i class="mini-spark">▁▂▃▅▃▆▇</i></div><div class="stat-card stat-tasks"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><span>今日完成</span><strong><b id="problemsSolved">0</b><em>题</em></strong><small>每一次作答都将沉淀</small><i class="mini-ring"></i></div><div class="stat-card stat-streak"><div class="stat-icon"><i class="fas fa-fire"></i></div><span>连续学习</span><strong><b id="streakDays">0</b><em>DAYS</em></strong><small>稳定节奏正在形成</small></div><div class="stat-card stat-goal"><div class="stat-icon"><i class="fas fa-star"></i></div><span>目标完成度</span><strong><b id="focusScore">--</b></strong><small>按今日目标实时计算</small><i class="goal-ring"></i></div></div><div class="analytics-main-grid"><section class="panel weekly-panel"><header><div><span>WEEKLY ACTIVITY</span><h3>本周学习时长</h3></div><strong id="weeklyTotal">0 min</strong></header><div class="chart-container" id="weeklyChart"></div></section><section class="panel weekly-summary"><i class="fas fa-wand-magic-sparkles"></i><span>本周学习总结</span><strong id="weeklySummaryTotal">0 min</strong><p id="weeklySummaryText">开始一次学习后，这里会出现你的本周节奏。</p></section></div><section class="panel subject-panel"><header><div><span>SUBJECT FOCUS</span><h3>学科投入分布</h3></div><small id="subjectOverview">等待学习记录</small></header><div class="subject-list" id="subjectList"></div></section></div>
+      </section>
+
+      <section class="page dashboard-page" id="page-dashboard" aria-label="学习数据可视化大屏">
+        <div class="dashboard-shell" id="statisticsDashboard"></div>
+      </section>
+
+      <section class="page" id="page-tools">
+        <header class="topbar"><div class="topbar-title"><button class="menu-btn" onclick="toggleSidebar()" aria-label="打开菜单"><i class="fas fa-bars"></i></button><div><h2>学习工具</h2><p>常用能力集中放在这里</p></div></div></header>
+        <div class="tools-content"><button class="tool-card" onclick="openTool('timer')"><i class="fas fa-stopwatch"></i><strong>番茄钟</strong><span>专注学习计时器</span></button><button class="tool-card" onclick="openTool('photo')"><i class="fas fa-camera"></i><strong>拍照解题</strong><span>上传题目图片获取解析</span></button><button class="tool-card" onclick="openTool('summary')"><i class="fas fa-book-open"></i><strong>每日总结</strong><span>回顾今天的学习成果</span></button><button class="tool-card" onclick="openTool('wrongbook')"><i class="fas fa-clipboard-list"></i><strong>错题集</strong><span>集中查看薄弱点和错题解析</span></button><button class="tool-card" onclick="openTool('goals')"><i class="fas fa-bullseye"></i><strong>目标设定</strong><span>设定并追踪学习目标</span></button><button class="tool-card" id="srcToolCard" onclick="toggleStatisticsSource()"><i class="fas fa-user-check"></i><strong>接入数据</strong><span id="srcToolState">接入个人学习计划内容</span></button></div>
+      </section>
+
+      <section class="page" id="page-plans">
+        <header class="topbar analytics-topbar"><div class="topbar-title"><button class="menu-btn" onclick="toggleSidebar()" aria-label="打开菜单"><i class="fas fa-bars"></i></button><div><span class="analytics-eyebrow">STUDY PLANS</span><h2>计划列表</h2><p>把你和小知对话时生成的学习计划收在这里，随时回看、按计划执行。</p></div></div></header>
+        <div class="page-scroll plans-scroll"><div class="plans-list" id="plansList"></div></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="settingsModal"><div class="modal-content"><div class="modal-header"><h3>设置</h3><button onclick="closeModal('settingsModal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><label>你的名字<input type="text" id="settingName" placeholder="输入你的名字"></label><label>学习科目<input type="text" id="settingSubject" placeholder="如：数学、英语、编程"></label><label>每日学习目标<input type="number" id="settingGoal" value="120" min="10" max="600"></label><label>休息提醒间隔<input type="number" id="settingBreakInterval" value="45" min="15" max="120"></label><button class="primary-btn" onclick="saveSettings()">保存设置</button></div></div></div>
+  <div class="modal" id="aiSetupModal"><div class="modal-content modal-center"><div class="ai-setup"><div id="aiSetupInputView"><div class="ai-setup-icon"><i class="fas fa-robot"></i></div><h3>接入大模型能力</h3><p class="ai-setup-desc">欢迎使用小知伴学。接入 DeepSeek 大模型后，AI 学习对话、出题、规划将更聪明。</p><label class="ai-setup-label">DeepSeek API Key<input type="password" id="aiSetupKey" placeholder="sk-..." autocomplete="off" oninput="clearAiSetupError()"></label><p class="ai-setup-error" id="aiSetupError" hidden>密钥无效或格式不正确，请重新输入</p><button class="primary-btn" onclick="connectAiKey()"><i class="fas fa-plug"></i> 接入大模型</button><button class="test-key-btn" onclick="connectDefaultAiKey()"><i class="fas fa-flask"></i> 接入测试密钥</button><button class="link-btn" onclick="skipAiSetup()">暂不接入，先用本地模式</button><p class="ai-setup-trust">程序本地运行不经公网密钥只保存在你本机配置中可放心使用</p><p class="ai-setup-note">内容由AI生成，仅供参考，请自主核实使用</p></div><div id="aiSetupSuccessView" hidden><div class="ai-setup-icon success-icon"><i class="fas fa-check"></i></div><h3>大模型接入成功！小知全部学习能力已解锁</h3><p class="ai-setup-desc">现在可以体验知识点拆解、难题详细解析、思路梳理等强大功能。</p><button class="primary-btn btn-success" onclick="closeAiSetupSuccess()">返回，开启学习之旅</button><button class="primary-btn" onclick="switchAiSetup('input')">更改当前 API 密钥</button><p class="ai-setup-note">内容由AI生成，仅供参考，请自主核实使用</p></div></div></div></div>
+  <div class="modal" id="timerModal"><div class="modal-content modal-center"><div class="modal-header"><h3>番茄钟</h3><button onclick="closeModal('timerModal')"><i class="fas fa-times"></i></button></div><div class="modal-body timer-body"><div class="timer-display" id="timerDisplay">25:00</div><div class="timer-controls"><button class="primary-btn" id="timerStartBtn" onclick="toggleTimer()">开始专注</button><button class="secondary-btn" onclick="resetTimer()">重置</button></div><div class="timer-presets"><button class="preset-btn active" onclick="setTimerPreset(25)">25 分钟</button><button class="preset-btn" onclick="setTimerPreset(45)">45 分钟</button><button class="preset-btn" onclick="setTimerPreset(60)">60 分钟</button></div></div></div></div>
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="/node_modules/echarts/dist/echarts.min.js"></script>
+  <script src="/js/agent.js"></script><script src="/js/tools.js"></script><script src="/js/ui.js"></script><script src="/js/plans.js"></script><script src="/js/statistics/mode.js"></script><script src="/js/statistics/types.js"></script><script src="/js/statistics/api.js"></script><script src="/js/statistics/service.js"></script><script src="/js/statistics/dashboard-components.js"></script><script src="/js/statistics/dashboard.js"></script><script src="/js/app.js"></script>
+</body>
+</html>
