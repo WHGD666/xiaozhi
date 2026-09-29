@@ -6,6 +6,15 @@
 
 # 快速开始
 
+本项目的启动步骤在**终端**中操作。若你尚未下载项目，可先通过 Git 克隆：
+
+``` bash
+git clone https://github.com/WHGD666/xiaozhi.git
+cd xiaozhi
+```
+
+若已在本机，请先在终端进入项目目录。
+
 ## 安装依赖
 
 ``` bash
